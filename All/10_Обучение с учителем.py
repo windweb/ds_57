@@ -808,3 +808,111 @@ auc_roc = roc_auc_score(target_valid, probabilities_one_valid)  # < напиши
 
 
 print(auc_roc)
+
+
+# Подготовка данных
+1.
+Загрузите данные из файла flights.csv. Напечатайте на экране:
+размер таблицы;
+первые пять строк таблицы.
+Изучите данные.
+
+import pandas as pd
+
+data = pd.read_csv('/datasets/flights.csv')
+
+# < напишите код здесь >
+print(data.shape)
+print(data.head(5))
+
+
+2.
+Преобразуйте категориальный признак техникой OHE. Приведите численные признаки к одному масштабу. Напечатайте на экране размеры таблиц (уже в прекоде).
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
+data = pd.read_csv('/datasets/flights.csv')
+
+data_ohe = pd.get_dummies(data, drop_first=True)  # < преобразуйте данные так, чтобы избежать дамми-ловушки >
+target = data_ohe['Arrival Delay']
+features = data_ohe.drop(['Arrival Delay'] , axis=1)
+# делим данные на обучающий и проверочный наборы
+features_train, features_valid, target_train, target_valid = train_test_split(
+    features, target, test_size=0.25, random_state=12345)
+# Нормализация числовых атрибутов
+numeric = ['Day', 'Day Of Week', 'Origin Airport Delay Rate',
+       'Destination Airport Delay Rate', 'Scheduled Time', 'Distance',
+       'Scheduled Departure Hour', 'Scheduled Departure Minute']
+
+scaler = StandardScaler()
+scaler.fit(features_train[numeric])
+features_train[numeric] = scaler.transform(features_train[numeric])
+features_valid[numeric] = scaler.transform(features_valid[numeric])  # < преобразуйте валидационную выборку >
+
+# Вывести размеры таблиц
+print(features_train.shape)
+print(features_valid.shape)
+
+
+# MSE в задаче регрессии
+
+1.
+Загрузите данные из файла /datasets/flights_preprocessed.csv. Обучите линейную регрессию. Посчитайте значение MSE на валидационной выборке и сохраните его в переменной mse. 
+Напечатайте на экране значения MSE и RMSE (уже в прекоде).
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+
+data = pd.read_csv('/datasets/flights_preprocessed.csv')
+
+target = data['Arrival Delay']
+features = data.drop(['Arrival Delay'] , axis=1)
+features_train, features_valid, target_train, target_valid = train_test_split(
+    features, target, test_size=0.25, random_state=12345)
+
+model = LinearRegression()
+model.fit(features_train, target_train)
+predicted_valid = model.predict(features_valid)  # сохраните предсказания модели на валидационых данных
+mse = mean_squared_error(target_valid, predicted_valid)
+
+print("MSE =", mse)
+print("RMSE =", mse ** 0.5)
+
+
+
+2.
+Вычислите MSE и RMSE для константной модели: каждому объекту она прогнозирует среднее значение целевого признака. Сохраните её предсказания в переменной predicted_valid. 
+Напечатайте на экране значения MSE и RMSE (уже в прекоде).
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+
+data = pd.read_csv('/datasets/flights_preprocessed.csv')
+
+target = data['Arrival Delay']
+features = data.drop(['Arrival Delay'] , axis=1)
+features_train, features_valid, target_train, target_valid = train_test_split(
+    features, target, test_size=0.25, random_state=12345)
+
+model = LinearRegression()
+model.fit(features_train, target_train)
+predicted_valid = model.predict(features_valid)
+mse = mean_squared_error(target_valid, predicted_valid)
+
+print("Linear Regression")
+print("MSE =", mse)
+print("RMSE =", mse ** 0.5)
+
+predicted_valid = pd.Series(target_train.mean(), index=target_valid.index)
+mse = mean_squared_error(target_valid, predicted_valid) # < напишите код здесь >) 
+
+print("Mean")
+print("MSE =", mse)
+print("RMSE =", mse ** 0.5)
+
