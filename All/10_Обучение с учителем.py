@@ -676,4 +676,56 @@ score = model.score(features_valid, target_valid)
 print("F1:", f1_score(target_valid, predicted_valid))
 
 #Изменение порога
+1.
+Найдите значения вероятностей классов для валидационной выборки. Значения вероятностей класса «1» сохраните в переменной probabilities_one_valid. Напечатайте на экране первые пять элементов этой переменной (уже в прекоде).
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+
+data = pd.read_csv('/datasets/travel_insurance_preprocessed.csv')
+
+target = data['Claim']
+features = data.drop('Claim', axis=1)
+features_train, features_valid, target_train, target_valid = train_test_split(
+    features, target, test_size=0.25, random_state=12345)
+
+model = LogisticRegression(random_state=12345, solver='liblinear')
+model.fit(features_train, target_train)
+
+# < напишите код здесь >
+probabilities_valid = model.predict_proba(features_valid)  # < напишите код здесь >
+probabilities_one_valid = probabilities_valid[:, 1]
+
+print(probabilities_one_valid[:5])
+
+2.
+Переберите значения порогов от 0 до 0.3 с шагом 0.02. Найдите для каждого значения точность и полноту. Напечатайте результаты на экране (в прекоде).
+Чтобы создать цикл с нужным диапазоном, мы применили функцию arange() (от англ. «упорядочивать») библиотеки numpy. Как и range(), функция перебирает указанные элементы диапазона, но работает не только с целыми, но и дробными числами. 
+Средства библиотеки numpy вы ещё изучите.
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import precision_score, recall_score
+
+data = pd.read_csv('/datasets/travel_insurance_preprocessed.csv')
+
+target = data['Claim']
+features = data.drop('Claim', axis=1)
+features_train, features_valid, target_train, target_valid = train_test_split(
+    features, target, test_size=0.25, random_state=12345)
+
+model = LogisticRegression(random_state=12345, solver='liblinear')
+model.fit(features_train, target_train)
+probabilities_valid = model.predict_proba(features_valid)
+probabilities_one_valid = probabilities_valid[:, 1]
+
+for threshold in np.arange(0, 0.3, 0.02):
+    predicted_valid = probabilities_one_valid > threshold
+    precision = precision_score(target_valid, predicted_valid)
+    recall = recall_score(target_valid, predicted_valid)
+
+    print("Порог = {:.2f} | Точность = {:.3f}, Полнота = {:.3f}".format(
+        threshold, precision, recall))
 
