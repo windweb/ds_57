@@ -916,3 +916,40 @@ print("Mean")
 print("MSE =", mse)
 print("RMSE =", mse ** 0.5)
 
+
+# Коэффициент детерминации
+Чтобы не пришлось всё время сравнивать модель со средним, введём новую метрику. Она выражена не в абсолютных значениях, а в относительных.
+Коэффициент детерминации, или метрика R2 (англ. coefficient of determination; R-squared), вычисляет долю средней квадратичной ошибки модели от MSE среднего, а затем вычитает эту величину из единицы. Увеличение метрики означает прирост качества модели. 
+Формула расчёта R2 выглядит так:
+
+
+R2 = 1 - (MSE модели / MSE среднего)
+Значение метрики R2 равно единице только в одном случае, если MSE нулевое. Такая модель предсказывает все ответы идеально.
+R2 равно нулю: модель работает так же, как и среднее.
+Если метрика R2 отрицательна, качество модели очень низкое.
+Значения R2 больше единицы быть не может.
+
+# задача
+Вычислите для линейной регрессии значение R2. Найдите в документации sklearn.metrics функцию для подсчёта этой метрики. Импортируйте её. 
+Напечатайте результат на экране (уже в прекоде).
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score  # < напишите код здесь >
+
+data = pd.read_csv('/datasets/flights_preprocessed.csv')
+
+target = data['Arrival Delay']
+features = data.drop(['Arrival Delay'] , axis=1)
+features_train, features_valid, target_train, target_valid = train_test_split(
+    features, target, test_size=0.25, random_state=12345)
+
+model = LinearRegression()
+model.fit(features_train, target_train)
+predicted_valid = model.predict(features_valid)
+
+print("R2 =", r2_score(target_valid, predicted_valid))  #  < напишите код здесь >)
+
+
+
