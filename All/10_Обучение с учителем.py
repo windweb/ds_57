@@ -952,4 +952,53 @@ predicted_valid = model.predict(features_valid)
 print("R2 =", r2_score(target_valid, predicted_valid))  #  < напишите код здесь >)
 
 
+# Среднее абсолютное отклонение
+# MAE (mean absolute error)
 
+1.
+Напишите функцию mae() на основе формулы. На вход она принимает правильные ответы и предсказания. Возвращает значение среднего абсолютного отклонения. 
+Обратите внимание: в Python модуль от числа вычисляется функцией abs() (от англ. absolute, «абсолютный»).
+Проверьте работу функции на примере в прекоде. Напечатайте результат на экране.
+
+import pandas as pd
+
+def mae(target, predictions):
+    error = 0
+    for i in range(target.shape[0]):
+        error += abs(target[i] - predictions[i])  # < напишите код здесь >)
+    return error / target.shape[0]
+            
+
+target = pd.Series([-0.5, 2.1, 1.5, 0.3])
+predictions = pd.Series([-0.6, 1.7, 1.6, 0.2])
+
+print(mae(target, predictions))
+
+
+Разбейте данные на обучающую и валидационную выборки.
+Инициализируйте модель с гиперпараметрами лучшей модели из прошлого урока.
+Обучите её на тренировочной выборке и посчитайте значение MAE на валидационной выборке.
+Если на тестовой выборке значение MAE больше 26.2, вернитесь в предыдущий урок с Jupyter Notebook и продолжите экспериментировать. Или подсмотрите гиперпараметры в подсказке.
+
+import pandas as pd
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_absolute_error
+
+data = pd.read_csv('/datasets/flights_preprocessed.csv')
+
+target = data['Arrival Delay']
+features = data.drop(['Arrival Delay'] , axis=1)
+features_train, features_valid, target_train, target_valid = train_test_split(
+    features, target, test_size=0.25, random_state=12345) # разбейте на обучающую и валидационную выборку
+
+model = RandomForestRegressor(n_estimators=80, max_depth=11, random_state=12345) # выберите наилучшую модель
+model.fit(features_train, target_train) # обучите модель на обучающей выборке
+predictions_train = model.predict(features_train) # получите предсказания на обучающей выборке
+predictions_valid = model.predict(features_valid) #получите предсказания на валидационной выборке
+print("Наилучшая модель")
+print("MAE на обучающей выборке: ", mean_absolute_error(target_train, predictions_train)) # найдите значение метрики MAE на обучающей выборке
+print("MAE на валидационной выборке: ", mean_absolute_error(target_valid, predictions_valid)) # найдите значение метрики MAE на валидационной выборке
