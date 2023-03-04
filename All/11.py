@@ -342,3 +342,92 @@ data['target'] = target
 data['target'] = data['target'].astype('int64')
 
 print(data.head())
+
+
+
+# Кросс-валидация
+
+"""
+Задача
+Дополните код цикла так, чтобы получить кросс-валидацию на трёх равных по размеру блоках. На каждом этапе цикла у вас есть номер первого элемента валидационной выборки и размер блока (sample_size).
+Создайте массивы: valid_indexes (англ. «индексы объектов валидационной выборки») и train_indexes (англ. «индексы объектов обучающей выборки»). Они содержат номера наблюдений для валидационной и обучающей выборок. Меняйте номера на каждом этапе цикла.
+Разбейте переменные features и target на выборки features_train, target_train, features_valid и target_valid так, чтобы в них были только наблюдения с нужными номерами.
+Оцените качество модели, обученной на каждой выборке, с помощью метода model.score().
+Посчитайте среднее качество модели и сохраните его в переменной final_score (англ. «итоговая оценка»). Напечатайте значение на экране (уже в прекоде).
+
+Подсказка
+
+Номера наблюдений для валидационной выборки начинаются с i. Размер промежутка равен размеру блока (sample_size). 
+Номера наблюдений для обучающего набора данных содержат два промежутка: 
+от 0 до i;
+от последнего элемента валидационной выборки до конца набора данных.
+
+"""
+
+"""
+Решение
+
+В этом решении мы сначала считываем данные и разделяем переменные features и target. Мы установили размер блока равным len(data)/3, поскольку хотим иметь три одинаковых по размеру блока.
+
+В цикле мы устанавливаем valid_indexes и train_indexes на основе текущего i и размера выборки. Затем мы разбиваем признаки и целевые переменные на обучающую и проверочную выборки, используя эти индексы.
+
+Мы создаем объект DecisionTreeClassifier и подгоняем его к обучающим данным. Затем мы вычисляем оценку модели на проверочных данных с помощью метода score(). Мы добавляем полученный результат в список баллов.
+
+Наконец, мы вычисляем средний балл моделей и выводим его на экран.
+"""
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+
+data = pd.read_csv('/datasets/heart.csv')
+features = data.drop(['target'], axis=1)
+target = data['target']
+
+scores = []
+
+# зададим размер блока, если их всего три
+sample_size = int(len(data)/3)
+
+for i in range(0, len(data), sample_size):
+    valid_indexes = range(i, i+sample_size)  # < запишите массив из индексов для валидационного блока >
+    train_indexes = list(set(range(len(data))) - set(valid_indexes))  # < запишите массив из индексов для обучающей выборки >
+    
+		# разбейте переменные features и target на выборки features_train, target_train, features_valid, target_valid
+    # < напишите код здесь >
+    features_train = features.iloc[train_indexes]
+    target_train = target.iloc[train_indexes]
+    features_valid = features.iloc[valid_indexes]
+    target_valid = target.iloc[valid_indexes]
+
+    model = DecisionTreeClassifier(random_state=0)
+    model = model.fit(features_train, target_train)
+    score = model.score(features_valid, target_valid)  # < оцените качество модели >
+    
+    scores.append(score)
+ 
+final_score = sum(scores) / len(scores)  # < посчитайте среднее качество модели >   
+print('Средняя оценка качества модели:', final_score)
+
+'''
+Посчитайте среднюю оценку качества методом кросс-валидации и сохраните её в переменной final_score. Обозначьте список оценок scores и получите его функцией cross_val_score(). 
+В коде уже есть print(), чтобы вывести final_score на экран.
+Подсказка
+
+Функция cross_val_score  возвращает список оценок качества моделей. Чтобы посчитать среднее, разделите сумму элементов массива на его длину.
+'''
+
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import cross_val_score
+
+data = pd.read_csv('/datasets/heart.csv')
+features = data.drop(['target'], axis=1)
+target = data['target']
+
+model = DecisionTreeClassifier(random_state=0)
+
+# < посчитайте оценки, вызвав функцию cross_value_score с пятью блоками >
+scores  = cross_val_score(model, features, target, cv=5)
+final_score = scores.mean()
+
+print('Средняя оценка качества модели:', final_score)
+
