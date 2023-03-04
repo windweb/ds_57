@@ -236,3 +236,84 @@ if pvalue < alpha:
 else:
     print("Не получилось отвергнуть нулевую гипотезу: скорее всего, средний чек не увеличился")
 
+    
+    
+# Бутстреп для моделей
+'''
+How to use Bootstrap to estimate confidence intervals for machine learning models?
+Zaspuk in 5 Minutes, a school for express English classes, is developing a model to estimate the probability that a student will come to class or not. Many applications are received every day. Priority is given on a first-come, first-served basis. About half of the students don't show up and don't pay for the class. The school management has decided to keep classes only for those students who are most likely to come. Because of the possible reputational risks, the company will implement this innovation if there is a guarantee of a noticeable increase in revenue. To make the right decision, estimate the probability distribution for profits.
+Here are the important terms of the task:
+The model for predicting the probability of attending a class has already been trained. The predictions are in eng_probabilities.csv, and the correct answers are in eng_target.csv.
+One lesson costs 1000 rubles. You can schedule up to 10 lessons per day. Current revenue for the day - 5000 rubles (half of the students cancel the lesson).
+Per day there is an average of 25 applications.
+Enough revenue to implement - 7500 rubles. Its probability should be at least 99%.
+
+The task is . 1.
+Write a function revenue(), which calculates and returns the revenue. It receives as input:
+a list of target responses - whether the student came to class;
+a list of probabilities probabilities - the model estimates whether the student is coming or not;
+how many students attend in a day count.
+The function should select the students with the highest probability of attendance and, based on the answers, calculate the possible revenue.
+The pre-code is an example of running the function when the lists of probabilities and answers are small and there are only three students.
+'''
+'''
+1.
+Напишите функцию revenue() (англ. «выручка»), которая подсчитывает и возвращает выручку. Она получает на вход:
+список ответов target — пришёл ли ученик на урок;
+список вероятностей probabilities — модель оценивает, придёт ученик или нет;
+сколько учеников посещает занятия за день count.
+Функция должна выбрать учеников с наибольшей вероятностью посещения и на основе ответов подсчитать возможную выручку.
+В прекоде пример запуска функции, когда списки вероятностей и ответов невелики, а  учеников только трое.
+'''
+import pandas as pd
+
+def revenue(target, probabilities, count):
+    # < напишите код здесь >
+    probs_sorted = probabilities.sort_values(ascending=False)
+    selected = target[probs_sorted.index][:count]
+    revenue = selected.sum()
+    return 1000 * revenue # < напишите код здесь >
+
+target = pd.Series([1,   1,   0,   0,  1,    0])
+probab = pd.Series([0.2, 0.9, 0.8, 0.3, 0.5, 0.1])
+
+res = revenue(target, probab, 3)
+
+print(res)
+
+'''
+2.
+Чтобы найти 1%-квантиль выручки, выполните процедуру Bootstrap с 1000 повторений. 
+Сохраните список оценок из бутстрепа в переменной values, а 0.01-квантиль — в переменной lower. Код выведет на экран среднюю выручку и 0.01-квантиль.
+'''
+
+import pandas as pd
+import numpy as np
+
+# открываем файлы
+# возьмём индекс '0', чтобы перевести данные в pd.Series
+target = pd.read_csv('/datasets/eng_target.csv')['0']
+probabilities = pd.read_csv('/datasets/eng_probabilities.csv')['0']
+
+def revenue(target, probabilities, count):
+    probs_sorted = probabilities.sort_values(ascending=False)
+    selected = target[probs_sorted.index][:count]
+    return 1000 * selected.sum()
+
+state = np.random.RandomState(12345)
+    
+values = []
+for i in range(1000):
+    # < напишите код здесь>
+    subsample = target.sample(n=25, random_state=state, replace=True)
+    probs_subsample = probabilities[subsample.index]
+    rev = revenue(subsample, probs_subsample, 10)
+    values.append(rev)  # < напишите код здесь>)
+
+values = pd.Series(values)
+lower = values.quantile(0.01)  # < напишите код здесь>
+
+mean = values.mean()
+print("Средняя выручка:", mean)
+print("1%-квантиль:", lower)
+
