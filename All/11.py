@@ -321,3 +321,24 @@ mean = values.mean()
 print("Средняя выручка:", mean)
 print("1%-квантиль:", lower)
 
+
+# Голосование по большинству
+
+'''Выполните процедуру голосования по большинству для набора данных. 
+Целевой признак сохраните в переменной target. 
+Напечатайте на экране первые пять строк полученной таблицы (уже в прекоде).'''
+
+import pandas as pd
+
+data = pd.read_csv('/datasets/heart_labeled.csv')
+
+target = []
+for i in range(data.shape[0]):
+    labels = data.loc[i, ['label_1', 'label_2', 'label_3']]  # < напишите код здесь >]
+    true_label = labels.mode().iloc[0]  # < напишите код здесь >
+    target.append(true_label)
+    
+data['target'] = target 
+data['target'] = data['target'].astype('int64')
+
+print(data.head())
