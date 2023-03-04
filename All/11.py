@@ -427,6 +427,13 @@ model = DecisionTreeClassifier(random_state=0)
 
 # < посчитайте оценки, вызвав функцию cross_value_score с пятью блоками >
 scores  = cross_val_score(model, features, target, cv=5)
+'''
+cross_val_score(model, features, target, cv=5)
+# model — необученная модель для кросс-валидации;
+# features — признаки;
+# target — целевой признак;
+# cv — число блоков для кросс-валидации (по умолчанию их три).
+'''
 final_score = scores.mean()
 
 print('Средняя оценка качества модели:', final_score)
