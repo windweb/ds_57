@@ -978,6 +978,13 @@ class NearestNeighborClassificator:
         for i in range(len(vector)):
             new_target.append(nearest_neighbor_predict(self.features_train, self.target_train, vector.loc[i]))
         return pd.Series(new_target)
+    # или
+#     def predict(self, new_features):
+#         predictions = []
+#         for vector in new_features.values:
+#             prediction = nearest_neighbor_predict(self.features_train, self.target_train, vector)
+#             predictions.append(prediction)
+#         return pd.Series(predictions)
         
 model = NearestNeighborClassificator()
 model.fit(train_features, train_target)
